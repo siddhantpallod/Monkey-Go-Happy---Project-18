@@ -6,7 +6,8 @@ var FoodGroup, bananaImage;
 var obstaclesGroup, obstacle_img;
 
 var gameOver;
-var score=0;
+var score = 0;
+var gameState = "start";
 
 
 function preload(){
@@ -47,19 +48,43 @@ function setup() {
 function draw() {
   
   background(255);
+ // console.log(gameState);
   
+  if (gameState === "start"){
+     if(obstaclesGroup.isTouching(player)){ 
+        player.scale=0.1;
+        //score = 0;
+        gameState = "over";       
+     }
+  }
     
-  if(ground.x<0) {
-    ground.x=ground.width/2;
+    if(gameState === "over"){
+      obstaclesGroup.setVelocityEach(0);
+     ground.velocityX = 0;
+     backgr.velocityX = 0;
+     FoodGroup.setVelocityEach(0);
+     player.visible = false;
+     
+     
+    }
+    if(ground.x<0) {
+        ground.x=ground.width/2;
   }
-  if(backgr.x<100){
-    backgr.x=backgr.width/2;
+       if(backgr.x<100){
+        backgr.x=backgr.width/2;
   }
+       if(keyDown("space") && player.y > 300 ) {
+      player.velocityY = -20;
+    }
+    player.velocityY = player.velocityY + 0.8;
+  
+  
   
     if(FoodGroup.isTouching(player)){
       FoodGroup.destroyEach();
     score = score + 2;
     }
+  
     switch(score){
         case 10: player.scale=0.12;
                 break;
@@ -72,31 +97,30 @@ function draw() {
         default: break;
     }
   
-    if(keyDown("space") ) {
-      player.velocityY = -12;
-    }
-    player.velocityY = player.velocityY + 0.8;
+    
   
-    player.collide(ground);
-    spawnFood();
-    spawnObstacles();
- 
-    if(obstaclesGroup.isTouching(player)){ 
-        player.scale=0.08;
-     // score=score-2;
-    }
-  
+  player.collide(ground);
+    
+    
+  spawnFood();
+  spawnObstacles();
   drawSprites();
   
   stroke("white");
   textSize(20);
   fill("white");
-  text("Score: "+ score, 500,50);
+  text("Score: "+ score, 470,50);
+  
+  if (gameState === "over"){
+      textSize(20);
+      stroke("white");
+      text("GAME OVER !!",200,200);
+  }
 }
 
 function spawnFood() {
   //write code here to spawn the food
-  if (frameCount % 80 === 0) {
+  if (frameCount % 110 === 0) {
     var banana = createSprite(600,250,40,10);
     banana.y = random(120,200);    
     banana.addImage(bananaImage);
@@ -123,8 +147,5 @@ function spawnObstacles() {
     
     //add each obstacle to the group
     obstaclesGroup.add(obstacle);
-  }
+  }  
 }
-
-
-  
